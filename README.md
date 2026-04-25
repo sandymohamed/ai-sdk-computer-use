@@ -10,7 +10,7 @@ A production-quality AI agent dashboard with two-panel layout, tool call visuali
 This project extends the Vercel AI SDK Computer Use demo into a feature-rich dashboard for monitoring and interacting with AI agents. Built with Next.js 15, TypeScript, and Tailwind CSS.
 
 **Live Demo**: https://ai-sdk-computer-7tqb0vqon-sandymohameds-projects.vercel.app/dashboard
-**Demo Video**: [Your video link]
+**Demo Video**: https://drive.google.com/file/d/1rRfWHhLe09EcGvElJvMyHdiDhklhZHzd/view?usp=sharing
 
 ---
 
@@ -269,13 +269,13 @@ npm run build
 ## 📹 Demo Video (5 minutes)
 
 **Chapters**:
-- **0:00-0:30** - Dashboard overview and layout
-- **0:30-1:30** - Ask questions (weather, geography, history)
-- **1:30-2:30** - Session management demonstration
-- **2:30-3:00** - Resizable panels
-- **3:00-4:00** - Mobile responsive view
-- **4:00-4:30** - Debug panel and events
-- **4:30-5:00** - Code quality overview
+ - Dashboard overview and layout
+ - Ask questions (weather)
+-  Session management demonstration
+-  Resizable panels
+-  Mobile responsive view
+-  Debug panel and events
+-  Code quality overview
 
 ---
 
