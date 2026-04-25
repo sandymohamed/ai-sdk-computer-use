@@ -26,6 +26,8 @@ interface Session {
   createdAt: number;
 }
 
+type MobileTab = 'chat' | 'tools' | 'desktop';
+
 // Mobile Menu Component
 function MobileMenu({ isOpen, onClose, sessions, activeSessionId, onSwitchSession, onCreateSession, onDeleteSession }: { 
   isOpen: boolean; 
@@ -216,7 +218,7 @@ export default function Dashboard() {
   const [debugOpen, setDebugOpen] = useState(false);
   const [selectedTool, setSelectedTool] = useState<ToolCall | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [activeMobileTab, setActiveMobileTab] = useState<'chat' | 'tools' | 'desktop'>('chat');
+  const [activeMobileTab, setActiveMobileTab] = useState<MobileTab>('chat');
   const [isMobile, setIsMobile] = useState(false);
   
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -247,29 +249,6 @@ export default function Dashboard() {
     onSaveSession: saveCurrentSession
   });
 
-  useEffect(() => {
-    const stored = localStorage.getItem("dashboard-sessions");
-    if (stored) {
-      const parsed = JSON.parse(stored) as Session[];
-      setSessions(parsed);
-      if (parsed.length > 0) {
-        setActiveSessionId(parsed[0].id);
-        setMessages(parsed[0].messages || []);
-        setToolCalls(parsed[0].toolCalls || []);
-      } else {
-        createNewSession();
-      }
-    } else {
-      createNewSession();
-    }
-  }, []);
-
-  useEffect(() => {
-    if (sessions.length > 0) {
-      localStorage.setItem("dashboard-sessions", JSON.stringify(sessions));
-    }
-  }, [sessions]);
-
   const createNewSession = useCallback(() => {
     const newId = crypto.randomUUID();
     const newSession: Session = {
@@ -285,6 +264,32 @@ export default function Dashboard() {
     setToolCalls([]);
     setSelectedTool(null);
   }, [sessions.length, setMessages, setToolCalls]);
+
+  // Load sessions from localStorage on mount
+  useEffect(() => {
+    const stored = localStorage.getItem("dashboard-sessions");
+    if (stored) {
+      const parsed = JSON.parse(stored) as Session[];
+      setSessions(parsed);
+      if (parsed.length > 0) {
+        setActiveSessionId(parsed[0].id);
+        setMessages(parsed[0].messages || []);
+        setToolCalls(parsed[0].toolCalls || []);
+      } else {
+        createNewSession();
+      }
+    } else {
+      createNewSession();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Save sessions to localStorage whenever they change
+  useEffect(() => {
+    if (sessions.length > 0) {
+      localStorage.setItem("dashboard-sessions", JSON.stringify(sessions));
+    }
+  }, [sessions]);
 
   const switchSession = useCallback((sessionId: string) => {
     if (sessionId === activeSessionId) return;
@@ -347,8 +352,8 @@ export default function Dashboard() {
         </div>
 
         <div className="bg-white border-b flex">
-          {['chat', 'tools', 'desktop'].map((tab) => (
-            <button key={tab} onClick={() => setActiveMobileTab(tab as any)} className={`flex-1 py-3 text-sm font-medium transition ${activeMobileTab === tab ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}>
+          {(['chat', 'tools', 'desktop'] as const).map((tab) => (
+            <button key={tab} onClick={() => setActiveMobileTab(tab)} className={`flex-1 py-3 text-sm font-medium transition ${activeMobileTab === tab ? 'text-blue-600 border-b-2 border-blue-600' : 'text-gray-500'}`}>
               {tab === 'chat' && '💬 Chat'}
               {tab === 'tools' && '🔧 Tools'}
               {tab === 'desktop' && '🖥️ Desktop'}
@@ -538,9 +543,9 @@ export default function Dashboard() {
             </div>
           </div>
         </ResizablePanels>
+        
       </div>
     </div>
   );
 }
-
 
