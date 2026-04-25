@@ -72,7 +72,7 @@ This project extends the Vercel AI SDK Computer Use demo into a feature-rich das
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR_USERNAME/ai-agent-dashboard.git
+git clone https://github.com/sandymohamed/ai-sdk-computer-use
 cd ai-agent-dashboard
 
 # 2. Install dependencies

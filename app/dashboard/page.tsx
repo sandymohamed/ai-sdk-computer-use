@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef, ReactNode } from "react";
+import { useState, useEffect, useCallback, ReactNode } from "react";
 import { getDesktopURL } from "@/lib/sandbox/utils";
 
 // Define proper types
@@ -197,7 +197,7 @@ function useSimpleChat({ api, body }: UseSimpleChatProps): UseSimpleChatReturn {
 
       const reader = response.body?.getReader();
       const decoder = new TextDecoder();
-      let assistantMessage: Message = {
+      const assistantMessage: Message = {
         role: "assistant",
         content: "",
         id: crypto.randomUUID(),
