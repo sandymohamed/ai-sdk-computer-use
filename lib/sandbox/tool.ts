@@ -57,23 +57,35 @@ function mapKey(key: string): string {
   return keyMap[key.toLowerCase()] || keyMap[key] || key;
 }
 
-export const computerTool = (sandboxId: string) =>
-  anthropic.tools.computer_20250124({
-    displayWidthPx: resolution.x,
-    displayHeightPx: resolution.y,
-    displayNumber: 1,
-    execute: async ({
-      action,
-      coordinate,
-      text,
-      duration,
-      scroll_amount,
-      scroll_direction,
-      start_coordinate,
-    }) => {
-      const sandbox = await getDesktop(sandboxId);
+export type ComputerUseInput = {
+  action: string;
+  coordinate?: [number, number];
+  text?: string;
+  duration?: number;
+  scroll_amount?: number;
+  scroll_direction?: string;
+  start_coordinate?: [number, number];
+};
 
-      switch (action) {
+export type ComputerUseResult =
+  | { type: "image"; data: string }
+  | { type: "text"; text: string };
+
+export async function executeComputerUse(
+  sandboxId: string,
+  {
+    action,
+    coordinate,
+    text,
+    duration,
+    scroll_amount,
+    scroll_direction,
+    start_coordinate,
+  }: ComputerUseInput,
+): Promise<ComputerUseResult> {
+  const sandbox = await getDesktop(sandboxId);
+
+  switch (action) {
         case "screenshot": {
           await sandbox.runCommand({
             cmd: "import",
@@ -224,7 +236,37 @@ export const computerTool = (sandboxId: string) =>
         default:
           throw new Error(`Unsupported action: ${action}`);
       }
-    },
+}
+
+export async function executeBashCommand(
+  sandboxId: string | undefined,
+  command: string,
+): Promise<string> {
+  const sandbox = await getDesktop(sandboxId);
+
+  try {
+    const result = await sandbox.runCommand({
+      cmd: "bash",
+      args: ["-c", command],
+      env: DISPLAY_ENV,
+    });
+    const stdout = await result.stdout();
+    return stdout || "(Command executed successfully with no output)";
+  } catch (error) {
+    console.error("Bash command failed:", error);
+    if (error instanceof Error) {
+      return `Error executing command: ${error.message}`;
+    }
+    return `Error executing command: ${String(error)}`;
+  }
+}
+
+export const computerTool = (sandboxId: string) =>
+  anthropic.tools.computer_20250124({
+    displayWidthPx: resolution.x,
+    displayHeightPx: resolution.y,
+    displayNumber: 1,
+    execute: async (args) => executeComputerUse(sandboxId, args),
     experimental_toToolResultContent(result) {
       if (typeof result === "string") {
         return [{ type: "text", text: result }];
@@ -247,26 +289,5 @@ export const computerTool = (sandboxId: string) =>
 
 export const bashTool = (sandboxId?: string) =>
   anthropic.tools.bash_20250124({
-    execute: async ({ command }) => {
-      const sandbox = await getDesktop(sandboxId);
-
-      try {
-        const result = await sandbox.runCommand({
-          cmd: "bash",
-          args: ["-c", command],
-          env: DISPLAY_ENV,
-        });
-        const stdout = await result.stdout();
-        return (
-          stdout || "(Command executed successfully with no output)"
-        );
-      } catch (error) {
-        console.error("Bash command failed:", error);
-        if (error instanceof Error) {
-          return `Error executing command: ${error.message}`;
-        } else {
-          return `Error executing command: ${String(error)}`;
-        }
-      }
-    },
+    execute: async ({ command }) => executeBashCommand(sandboxId, command),
   });

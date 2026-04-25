@@ -41,8 +41,9 @@ export const PromptSuggestions = ({
       {suggestions.map((suggestion, index) => (
         <Button
           key={index}
-          variant="pill"
-          size="pill"
+          variant="secondary"
+          size="sm"
+          className="rounded-full"
           onClick={() => submitPrompt(suggestion.prompt)}
           disabled={disabled}
         >
