@@ -42,7 +42,7 @@ export async function POST(req: NextRequest) {
       console.error('OpenRouter API error:', response.status, errorText);
 
       // Simple fallback for any type of API failure
-      return handleFallback(messages);
+      return handleFallback();
     }
 
     // Stream the response back exactly as received
@@ -110,12 +110,12 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.error('Chat API error:', error);
     // Simple fallback for network issues
-    return handleFallback([]);
+    return handleFallback();
   }
 }
 
 // Simple fallback - just tells user there's an API issue
-async function handleFallback(messages: any[]) {
+async function handleFallback() {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     start(controller) {

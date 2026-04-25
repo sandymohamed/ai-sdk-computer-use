@@ -30,7 +30,7 @@ export default function VNCViewer({ streamUrl }: VNCViewerProps) {
           }
         `;
         iframe.contentDocument.head.appendChild(style);
-      } catch (e) {
+      } catch {
         // Cross-origin restrictions - ignore
         console.log("Cannot modify iframe content due to CORS");
       }
